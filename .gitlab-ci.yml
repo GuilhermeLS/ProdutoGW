@@ -1,0 +1,70 @@
+stages:
+  - build
+  - test
+  - publish
+  - deploy
+
+variables:
+  # Caminhos do projeto
+  SOLUTION_PATH: "ProdutoGW.sln"
+  BUILD_PLATFORM: "Any CPU"
+  BUILD_CONFIGURATION: "Release"
+  BUILD_OUTPUT_DIR: "bin/$(BUILD_CONFIGURATION)"
+  DOCKER_IMAGE_NAME: "produto-api"
+  DOCKER_REGISTRY: "yourRegistryName"
+  DOCKER_REPO: "produto-repo"
+
+before_script:
+  # Instalação do .NET SDK
+  - 'echo "Installing .NET SDK"'
+  - 'apt-get update && apt-get install -y apt-transport-https'
+  - 'curl -sSL https://dotnet.microsoft.com/download/dotnet/thank-you/dotnet-sdk-7.0.100-linux-x64-installer | bash'
+  - 'dotnet --version'
+
+# Etapa de Build
+build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  script:
+    # Restaura as dependências
+    - 'dotnet restore $SOLUTION_PATH'
+    # Realiza o build
+    - 'dotnet build $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --output $BUILD_OUTPUT_DIR'
+  only:
+    - develop  # Dispara apenas na branch 'develop'
+
+# Etapa de Testes
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  script:
+    # Executa os testes unitários
+    - 'dotnet test $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --logger trx'
+  only:
+    - develop
+
+# Etapa de Publicação
+publish:
+  stage: publish
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  script:
+    # Publica a aplicação
+    - 'dotnet publish $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --output ./publish'
+  only:
+    - develop
+
+# Etapa de Deploy (utilizando Docker)
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind  # Habilita o Docker-in-Docker
+  script:
+    # Autentica no Docker Registry (se necessário)
+    - 'echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $DOCKER_REGISTRY'
+    # Cria a imagem Docker
+    - 'docker build -t $DOCKER_REGISTRY/$DOCKER_REPO:$CI_COMMIT_SHA ./ProdutoGW.API'
+    # Faz o push da imagem para o Docker Registry
+    - 'docker push $DOCKER_REGISTRY/$DOCKER_REPO:$CI_COMMIT_SHA'
+  only:
+    - develop
