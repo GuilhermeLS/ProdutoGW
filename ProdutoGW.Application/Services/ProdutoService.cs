@@ -47,10 +47,12 @@ namespace ProdutoGW.Application.Services
                 return null; 
             }
 
+            // Atualiza os dados do produto
             existingProduto.Nome = produto.Nome;
             existingProduto.Preco = produto.Preco;
             existingProduto.Descricao = produto.Descricao;
 
+            // Chama o repositório para salvar a atualização
             var updatedProduto = await _produtoRepository.UpdateAsync(existingProduto);
             return updatedProduto;
         }

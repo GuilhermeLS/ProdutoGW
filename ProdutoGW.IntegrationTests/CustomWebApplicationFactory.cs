@@ -32,6 +32,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
             // Obter a string de conexão diretamente do arquivo de configurações
             var connectionString = configuration.GetConnectionString("DefaultConnection"); // Nome da chave da string de conexão
 
+            // Configurar o banco de dados real
             services.AddDbContext<ProdutoContext>(options =>
                 options.UseSqlServer(connectionString));
 
