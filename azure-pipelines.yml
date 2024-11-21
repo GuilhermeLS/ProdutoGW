@@ -1,7 +1,5 @@
 trigger:
-  branches:
-    include:
-      - develop
+- develop
 
 pool:
   vmImage: 'windows-latest'
@@ -13,54 +11,39 @@ variables:
   connectionString: 'Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True'
 
 steps:
-  # Etapa 1: Baixar o código do repositório
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.x'
-      addToPath: true
-    displayName: 'Instalar Python'
 
-  # Etapa 2: Restaurar pacotes NuGet
-  - task: NuGetCommand@2
-    inputs:
-      restoreSolution: $(solution)
+# Etapa de build
+- task: MSBuild@1
+  inputs:
+    solution: $(solution)
+    arguments: '/p:Configuration=$(buildConfiguration)'
+    platform: $(buildPlatform)
+    configuration: $(buildConfiguration)
 
-  # Etapa 3: Build do projeto
-  - task: MSBuild@1
-    inputs:
-      solution: $(solution)
-      msbuildArgs: '/p:Configuration=$(buildConfiguration)'
-      platform: $(buildPlatform)
-      configuration: $(buildConfiguration)
+# Etapa de testes unitários
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
 
-  # Etapa 4: Testes Unitários
-  - task: DotNetCoreCLI@2
-    displayName: 'Executar Testes Unitários'
-    inputs:
-      command: test
-      projects: '**/ProdutoGW.Tests/ProdutoGW.Tests.csproj'
-      arguments: '--configuration $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
 
-  # Etapa 5: Testes de Integração
-  - task: DotNetCoreCLI@2
-    displayName: 'Executar Testes de Integração'
-    inputs:
-      command: test
-      projects: '**/ProdutoGW.IntegrationTests/ProdutoGW.IntegrationTests.csproj'
-      arguments: '--configuration $(buildConfiguration)'
-      env:
-       ConnectionStrings__DefaultConnection: $(connectionString)
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
 
-  # Etapa 6: Preparar o Docker (ainda em desenvolvimento)
-#  - task: Docker@2
-#    displayName: 'Preparar Imagem Docker'
-#    inputs:
-#      containerRegistry: '$(dockerRegistryServiceConnection)'
-#      repository: 'produto-gw-api'
-#      command: 'buildAndPush'
-#      Dockerfile: '**/Dockerfile'
-#     tags: |
-#        $(Build.BuildId)
+# Testes de integração 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-  # Etapa 7: Deploy no Docker (adicionar detalhes quando disponíveis)
-  # Adicionar configurações quando o destino estiver definido.
+
+
