@@ -2,7 +2,7 @@ trigger:
 - develop  # Disparar o pipeline na branch 'develop'
 
 pool:
-  vmImage: 'windows-latest'  # Usar a imagem do Windows mais recente
+  vmImage: 'windows-latest'  # Usar a imagem do Windows mais recente (não paralelizado)
 
 variables:
   solution: 'ProdutoGW.sln'  # Caminho para o arquivo de solução
@@ -51,4 +51,20 @@ jobs:
         projects: '**/*.csproj'  # Publicar para integração
         arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
 
+    # Etapa de deploy (exemplo de deploy com Docker)
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        repository: 'produto-repo'  # Repositório Docker (ajustar conforme seu repositório)
+        dockerfile: '$(Build.SourcesDirectory)/ProdutoGW.API/Dockerfile'  # Caminho para o Dockerfile do projeto API
+        tags: '$(Build.BuildId)'  # Tag para a imagem Docker, geralmente o BuildId
+        containerRegistry: 'yourRegistryName'  # Nome do seu registry Docker (ajustar conforme necessário)
+        buildContext: '$(Build.SourcesDirectory)/ProdutoGW.API'  # Contexto do build Docker
 
+    # Push para o repositório de imagens Docker após o build (caso aplicável)
+    - task: Docker@2
+      inputs:
+        command: 'push'
+        repository: 'produto-repo'
+        tags: '$(Build.BuildId)'
+        containerRegistry: 'yourRegistryName'  # Ajustar para o seu registry Docker

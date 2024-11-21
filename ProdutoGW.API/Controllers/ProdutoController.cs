@@ -73,5 +73,6 @@ namespace ProdutoGW.API.Controllers
             await _produtoService.DeleteAsync(id);
             return NoContent();
         }
+
     }
 }
