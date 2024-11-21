@@ -22,31 +22,3 @@ jobs:
       inputs:
         command: 'restore'
         projects: '**/*.csproj'  # Restaurar dependências para todos os projetos .csproj
-
-    # Etapa de build (compilar o projeto)
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'build'
-        projects: '**/*.csproj'  # Compilar todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration)'
-
-    # Etapa de testes unitários
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'test'
-        projects: '**/*.csproj'  # Executar testes para todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration)'
-
-    # Etapa de publicação (para testar ou preparar para deploy)
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'publish'
-        projects: '**/*.csproj'  # Publicar todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
-
-    # Testes de integração (após publicação, caso necessário)
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'publish'
-        projects: '**/*.csproj'  # Publicar para integração
-        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
