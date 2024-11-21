@@ -27,5 +27,6 @@ namespace ProdutoGW.API.Controllers
             var token = _tokenService.GerarToken(usuario);
             return Ok(new { token });
         }
+
     }
 }
