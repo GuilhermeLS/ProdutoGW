@@ -44,7 +44,7 @@ namespace ProdutoGW.Application.Services
             var existingProduto = await _produtoRepository.GetByIdAsync(produto.Id);
             if (existingProduto == null)
             {
-                return null; // Ou lançar uma exceção, dependendo do seu caso
+                return null; 
             }
 
             // Atualiza os dados do produto
