@@ -7,16 +7,13 @@ stages:
 variables:
   # Caminhos do projeto
   SOLUTION_PATH: "ProdutoGW.sln"
-  BUILD_PLATFORM: "Any CPU"
   BUILD_CONFIGURATION: "Release"
-  BUILD_OUTPUT_DIR: "bin/$(BUILD_CONFIGURATION)"
-  DOCKER_IMAGE_NAME: "produto-api"
-  DOCKER_REGISTRY: "yourRegistryName"
-  DOCKER_REPO: "produto-repo"
+  BUILD_OUTPUT_DIR: "bin/Release/net7.0"
+  CONNECTION_STRING: "Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True"
 
 before_script:
-  # Instalação do .NET SDK
-  - 'echo "Installing .NET SDK"'
+  # Instalação do .NET SDK no runner
+  - 'echo "Configuring .NET SDK environment"'
   - 'apt-get update && apt-get install -y apt-transport-https'
   - 'curl -sSL https://dotnet.microsoft.com/download/dotnet/thank-you/dotnet-sdk-7.0.100-linux-x64-installer | bash'
   - 'dotnet --version'
@@ -26,20 +23,32 @@ build:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:7.0
   script:
-    # Restaura as dependências
     - 'dotnet restore $SOLUTION_PATH'
-    # Realiza o build
-    - 'dotnet build $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --output $BUILD_OUTPUT_DIR'
+    - 'dotnet build $SOLUTION_PATH --configuration $BUILD_CONFIGURATION'
   only:
-    - develop  # Dispara apenas na branch 'develop'
+    - develop
 
-# Etapa de Testes
-test:
+# Etapa de Testes Unitários
+unit_tests:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:7.0
   script:
-    # Executa os testes unitários
-    - 'dotnet test $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --logger trx'
+    - 'dotnet test $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --filter "FullyQualifiedName~ProdutoGW.Tests" --logger "trx;LogFileName=unit_tests_results.trx"'
+  artifacts:
+    paths:
+      - unit_tests_results.trx
+  only:
+    - develop
+
+# Etapa de Testes de Integração
+integration_tests:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  script:
+    - 'dotnet test $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --filter "FullyQualifiedName~ProdutoGW.IntegrationTests" --logger "trx;LogFileName=integration_tests_results.trx"'
+  artifacts:
+    paths:
+      - integration_tests_results.trx
   only:
     - develop
 
@@ -48,23 +57,20 @@ publish:
   stage: publish
   image: mcr.microsoft.com/dotnet/sdk:7.0
   script:
-    # Publica a aplicação
-    - 'dotnet publish $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --output ./publish'
+    - 'dotnet publish $SOLUTION_PATH --configuration $BUILD_CONFIGURATION --output $BUILD_OUTPUT_DIR'
+  artifacts:
+    paths:
+      - $BUILD_OUTPUT_DIR
   only:
     - develop
 
-# Etapa de Deploy (utilizando Docker)
+# Etapa de Deploy
 deploy:
   stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind  # Habilita o Docker-in-Docker
+  image: mcr.microsoft.com/dotnet/sdk:7.0
   script:
-    # Autentica no Docker Registry (se necessário)
-    - 'echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $DOCKER_REGISTRY'
-    # Cria a imagem Docker
-    - 'docker build -t $DOCKER_REGISTRY/$DOCKER_REPO:$CI_COMMIT_SHA ./ProdutoGW.API'
-    # Faz o push da imagem para o Docker Registry
-    - 'docker push $DOCKER_REGISTRY/$DOCKER_REPO:$CI_COMMIT_SHA'
+    - 'echo "Starting deployment process..."'
+    - 'echo "Copying files to server or executing deploy scripts here."'
+    # Adicione comandos para envio de arquivos ou execução de scripts no servidor de destino.
   only:
     - develop
