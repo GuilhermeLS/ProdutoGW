@@ -1,0 +1,70 @@
+trigger:
+- develop  # Disparar o pipeline na branch 'develop'
+
+pool:
+  vmImage: 'windows-latest'  # Usar a imagem do Windows mais recente (não paralelizado)
+
+variables:
+  solution: 'ProdutoGW.sln'  # Caminho para o arquivo de solução
+  buildConfiguration: 'Release'  # Configuração de build
+  buildPlatform: 'Any CPU'  # Plataforma do build
+  buildOutput: '$(Build.ArtifactStagingDirectory)'  # Diretório de saída dos artefatos
+  dbConnectionString: 'Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True'  # String de conexão com o banco de dados
+
+jobs:
+- job: BuildAndTest  # Job único para build e testes
+  pool:
+    vmImage: 'windows-latest'  # Especificando o ambiente do agente
+  steps:
+
+    # Etapa de restore (restaurar dependências)
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'  # Restaurar dependências para todos os projetos .csproj
+
+    # Etapa de build (compilar o projeto)
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'  # Compilar todos os projetos .csproj
+        arguments: '--configuration $(buildConfiguration)'
+
+    # Etapa de testes unitários
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'test'
+        projects: '**/*.csproj'  # Executar testes para todos os projetos .csproj
+        arguments: '--configuration $(buildConfiguration)'
+
+    # Etapa de publicação (para testar ou preparar para deploy)
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'  # Publicar todos os projetos .csproj
+        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
+
+    # Testes de integração (após publicação, caso necessário)
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'  # Publicar para integração
+        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
+
+    # Etapa de deploy (exemplo de deploy com Docker)
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+        repository: 'produto-repo'  # Repositório Docker (ajustar conforme seu repositório)
+        dockerfile: '$(Build.SourcesDirectory)/ProdutoGW.API/Dockerfile'  # Caminho para o Dockerfile do projeto API
+        tags: '$(Build.BuildId)'  # Tag para a imagem Docker, geralmente o BuildId
+        containerRegistry: 'yourRegistryName'  # Nome do seu registry Docker (ajustar conforme necessário)
+        buildContext: '$(Build.SourcesDirectory)/ProdutoGW.API'  # Contexto do build Docker
+
+    # Push para o repositório de imagens Docker após o build (caso aplicável)
+    - task: Docker@2
+      inputs:
+        command: 'push'
+        repository: 'produto-repo'
+        tags: '$(Build.BuildId)'
+        containerRegistry: 'yourRegistryName'  # Ajustar para o seu registry Docker
