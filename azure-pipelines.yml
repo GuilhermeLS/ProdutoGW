@@ -14,7 +14,7 @@ variables:
 jobs:
 - job: BuildAndTest  # Job único para build e testes
   pool:
-    vmImage: 'windows-latest'  # Especificando o ambiente do agente
+    vmImage: 'ubuntu-latest'  # Especificando o ambiente do agente
   steps:
 
     # Etapa de restore (restaurar dependências)
