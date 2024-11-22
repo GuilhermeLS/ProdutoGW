@@ -34,7 +34,7 @@ namespace ProdutoGW.API.Controllers
 
                 var response = _mapper.Map<ProdutoResponse>(createdProduto);
 
-                return CreatedAtAction(nameof(Create), new { response.ProdutoGuid }, response);
+                return CreatedAtAction(nameof(Created), new { response.ProdutoGuid }, response);
             }
             catch (Exception ex)
             {
