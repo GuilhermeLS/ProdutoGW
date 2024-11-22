@@ -26,7 +26,7 @@ namespace ProdutoGW.Application.Services
             {
                 Subject = new ClaimsIdentity(new Claim[] 
                 { 
-                    new Claim("usuarioId", usuario.Id.ToString()),
+                    new Claim("usuarioId", usuario.Guid.ToString()),
                     new Claim("usuarioNome", usuario.Nome),
                     new Claim("usuarioRole", usuario.Role)
                 }),

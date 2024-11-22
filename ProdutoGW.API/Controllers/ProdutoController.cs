@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
+using ProdutoGW.Domain.Requests.Produtos;
+using ProdutoGW.Domain.Responses.Produtos;
 
 namespace ProdutoGW.API.Controllers
 {
@@ -12,19 +15,26 @@ namespace ProdutoGW.API.Controllers
     public class ProdutoController : ControllerBase
     {
         private readonly IProdutoService _produtoService;
+        private readonly IMapper _mapper;
 
-        public ProdutoController(IProdutoService produtoService)
+        public ProdutoController(IProdutoService produtoService, IMapper mapper)
         {
             _produtoService = produtoService;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Produto produto)
+        public async Task<IActionResult> Create([FromBody] ProdutoCreateRequest produtoRequest)
         {
             try
             {
+                var produto = _mapper.Map<Produto>(produtoRequest);
+
                 var createdProduto = await _produtoService.CreateAsync(produto);
-                return CreatedAtAction(nameof(GetById), new { id = createdProduto.Id }, createdProduto);
+
+                var response = _mapper.Map<ProdutoResponse>(createdProduto);
+
+                return CreatedAtAction(nameof(Create), new { response.ProdutoGuid }, response);
             }
             catch (Exception ex)
             {
@@ -36,30 +46,38 @@ namespace ProdutoGW.API.Controllers
         public async Task<IActionResult> GetAll()
         {
             var produtos = await _produtoService.GetAllAsync();
-            if (produtos == null)
+            if (produtos == null || !produtos.Any())
                 return NotFound();
-            return Ok(produtos);
+
+            var response = _mapper.Map<IEnumerable<ProdutoResponse>>(produtos);
+
+            return Ok(response);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{produtoGuid}")]
+        public async Task<IActionResult> GetByGuid(Guid produtoGuid)
         {
-            var produto = await _produtoService.GetByIdAsync(id);
+            var produto = await _produtoService.GetByGuidAsync(produtoGuid);
             if (produto == null)
                 return NotFound();
-            return Ok(produto);
+
+            var response = _mapper.Map<ProdutoResponse>(produto);
+
+            return Ok(response);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Produto produto)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] ProdutoCreateRequest produtoRequest)
         {
-            if (id != produto.Id)
-                return BadRequest("ID no caminho e corpo não correspondem.");
-
             try
             {
+                var produto = _mapper.Map<Produto>(produtoRequest);
+
                 var updatedProduto = await _produtoService.UpdateAsync(produto);
-                return Ok(updatedProduto);
+
+                var response = _mapper.Map<ProdutoResponse>(updatedProduto);
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -67,10 +85,10 @@ namespace ProdutoGW.API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{produtoGuid}")]
+        public async Task<IActionResult> Delete(Guid produtoGuid)
         {
-            await _produtoService.DeleteAsync(id);
+            await _produtoService.DeleteAsync(produtoGuid);
             return NoContent();
         }
 

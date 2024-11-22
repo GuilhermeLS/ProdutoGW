@@ -14,6 +14,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
 using ProdutoGW.Infrastructure.Repositories.ProdutoGW.Infrastructure.Repositories;
+using ProdutoGW.API.AutoMappers;
 
 public class Startup
 {
@@ -65,6 +66,8 @@ public class Startup
 
         services.AddControllers();
         services.AddAuthorization();
+
+        services.AddAutoMapper(typeof(MappingProfile));
 
         // Configuração de Swagger
         services.AddEndpointsApiExplorer();

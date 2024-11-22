@@ -12,7 +12,6 @@ namespace ProdutoGW.Domain.Validation
             RuleFor(p => p.Marca).NotEmpty().WithMessage("Marca é obrigatória.");
             RuleFor(p => p.Preco).GreaterThan(0).WithMessage("Preço deve ser maior que 0.");
             RuleFor(p => p.QuantidadeEmEstoque).GreaterThanOrEqualTo(0).WithMessage("Quantidade em estoque não pode ser negativa.");
-            //RuleFor(x => x.Descricao).NotEmpty().Matches("^[a-zA-Z0-9 ]*$").WithMessage("Descrição não pode conter caracteres especiais.");
         }
     }
 }

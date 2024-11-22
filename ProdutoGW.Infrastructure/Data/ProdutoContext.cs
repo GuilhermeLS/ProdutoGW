@@ -23,6 +23,7 @@ namespace ProdutoGW.Infrastructure.Data
             {
                 entity.ToTable("Produtos");
                 entity.HasKey(p => p.Id);
+                entity.Property(p => p.Guid).IsRequired().HasColumnType("uniqueIdentifier");
                 entity.Property(p => p.Nome).IsRequired().HasColumnType("varchar(100)");
                 entity.Property(p => p.Descricao).HasColumnType("varchar(200)");
                 entity.Property(p => p.Categoria).IsRequired().HasColumnType("varchar(50)");
@@ -34,6 +35,7 @@ namespace ProdutoGW.Infrastructure.Data
             {
                 entity.ToTable("Usuarios");
                 entity.HasKey(u => u.Id);
+                entity.Property(u => u.Guid).IsRequired().HasColumnType("uniqueIdentifier");
                 entity.Property(u => u.Nome).IsRequired().HasColumnType("varchar(100)");
                 entity.Property(u => u.Email).IsRequired().HasColumnType("varchar(200)");
                 entity.Property(u => u.SenhaHash).IsRequired().HasColumnType("varchar(MAX)");
@@ -45,6 +47,7 @@ namespace ProdutoGW.Infrastructure.Data
                 new Usuario
                 {
                     Id = 1,
+                    Guid = Guid.NewGuid(),
                     Nome = "Administrador",
                     Email = "admin@dominio.com",
                     SenhaHash = BCrypt.Net.BCrypt.HashPassword("admin"), 
