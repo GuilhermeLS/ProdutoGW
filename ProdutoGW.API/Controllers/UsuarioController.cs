@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Domain.Requests;
+using ProdutoGW.Domain.Requests.Usuarios;
+using ProdutoGW.Domain.Responses.Usuarios;
 
 namespace ProdutoGW.API.Controllers
 {
@@ -11,31 +14,33 @@ namespace ProdutoGW.API.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
+        private readonly IMapper _mapper;
 
-        public UsuarioController(IUsuarioService usuarioService)
+        public UsuarioController(IUsuarioService usuarioService, IMapper mapper)
         {
             _usuarioService = usuarioService;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Create([FromBody] UsuarioCreateRequest request)
         {
-            var usuario = new Usuario
-            {
-                Nome = request.Nome,
-                Email = request.Email,
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha),
-                Role = "User" 
-            };
+            // Usa o AutoMapper para mapear o request para a entidade de domínio
+            var usuario = _mapper.Map<Usuario>(request);
+            usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha); // Gera o hash da senha
+            usuario.Role = "User"; // Define a role padrão para novos usuários
 
-            var result = await _usuarioService.CreateAsync(usuario);
-            return CreatedAtAction(nameof(Create), new { id = result.Id }, result);
+            var createdUsuario = await _usuarioService.CreateAsync(usuario);
+
+            // Mapeia a entidade criada para a response
+            var response = _mapper.Map<UsuarioResponse>(createdUsuario);
+            return CreatedAtAction(nameof(Create), new { response.UsuarioGuid }, response);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{guid}")]
+        public async Task<IActionResult> Delete(Guid usuarioGuid)
         {
-            await _usuarioService.DeleteAsync(id);
+            await _usuarioService.DeleteAsync(usuarioGuid);
             return NoContent();
         }
     }

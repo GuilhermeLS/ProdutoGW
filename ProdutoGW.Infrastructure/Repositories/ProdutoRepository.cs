@@ -24,9 +24,9 @@ namespace ProdutoGW.Infrastructure.Repositories
             return await _context.Produtos.ToListAsync();
         }
 
-        public async Task<Produto> GetByIdAsync(int id)
+        public async Task<Produto> GetByGuidAsync(Guid guid)
         {
-            return await _context.Produtos.FindAsync(id);
+            return await _context.Produtos.FirstOrDefaultAsync(p => p.Guid == guid);
         }
 
         public async Task<Produto> CreateAsync(Produto produto)
@@ -43,15 +43,12 @@ namespace ProdutoGW.Infrastructure.Repositories
             return produto;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Produto produto)
         {
-            var produto = await _context.Produtos.FindAsync(id);
-            if (produto != null)
-            {
-                _context.Produtos.Remove(produto);
-                await _context.SaveChangesAsync();
-            }
+            _context.Produtos.Remove(produto);
+            await _context.SaveChangesAsync();
         }
+
 
     }
 }
