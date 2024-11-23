@@ -1,70 +1,103 @@
 trigger:
-- develop  # Disparar o pipeline na branch 'develop'
+- develop  
 
 pool:
-  vmImage: 'windows-latest'  # Usar a imagem do Windows mais recente
+  vmImage: 'ubuntu-latest'  
 
 variables:
-  solution: 'ProdutoGW.sln'  # Caminho para o arquivo de solução
-  buildConfiguration: 'Release'  # Configuração de build
-  buildPlatform: 'Any CPU'  # Plataforma do build
-  buildOutput: '$(Build.ArtifactStagingDirectory)'  # Diretório de saída dos artefatos
-  dbConnectionString: 'Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True'  # String de conexão com o banco de dados
+  solution: '**/ProdutoGW.sln' 
+  buildConfiguration: 'Release'  
+  buildPlatform: 'Any CPU'  
+  buildOutput: '$(Build.ArtifactStagingDirectory)'  
+  dbConnectionString: 'Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True'  
+  testResultsDirectory: '$(Build.SourcesDirectory)/TestResults'  # Diretório para os resultados dos testes
 
 jobs:
-- job: BuildAndTest  # Job único para build e testes
+- job: BuildTestPublish
+  displayName: "Build, Test and Publish"
   pool:
-    vmImage: 'windows-latest'  # Especificando o ambiente do agente
+    vmImage: 'ubuntu-latest'
   steps:
+    # Instalar o SDK do .NET
+    - task: UseDotNet@2
+      displayName: "Instalar SDK do .NET"
+      inputs:
+        packageType: sdk
+        version: '7.0'  # Ajustar conforme versão do .NET usada no projeto
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
-    # Etapa de restore (restaurar dependências)
+    # Restaurar dependências
     - task: DotNetCoreCLI@2
+      displayName: "Restaurar dependências"
       inputs:
         command: 'restore'
-        projects: '**/*.csproj'  # Restaurar dependências para todos os projetos .csproj
+        projects: '$(solution)'
 
-    # Etapa de build (compilar o projeto)
+    # Compilar o projeto
     - task: DotNetCoreCLI@2
+      displayName: "Compilar solução"
       inputs:
         command: 'build'
-        projects: '**/*.csproj'  # Compilar todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration)'
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
 
-    # Etapa de testes unitários
+    # Executar testes unitários
     - task: DotNetCoreCLI@2
+      displayName: "Executar testes unitários"
       inputs:
         command: 'test'
-        projects: '**/*.csproj'  # Executar testes para todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration)'
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(testResultsDirectory)'
 
-    # Etapa de publicação (para testar ou preparar para deploy)
+    # Publicar os resultados dos testes unitários
+    - task: PublishTestResults@2
+      displayName: "Publicar resultados dos testes unitários"
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(testResultsDirectory)'
+
+    # Executar testes de integração
     - task: DotNetCoreCLI@2
+      displayName: "Executar testes de integração"
+      inputs:
+        command: 'test'
+        projects: '**/ProdutoGW.IntegrationTests/ProdutoGW.IntegrationTests.csproj'  
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(testResultsDirectory)'
+        env:
+          ASPNETCORE_ENVIRONMENT: 'Integration'  
+          ConnectionStrings__DefaultConnection: '$(dbConnectionString)'  
+
+    # Publicar os resultados dos testes de integração
+    - task: PublishTestResults@2
+      displayName: "Publicar resultados dos testes de integração"
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(testResultsDirectory)'
+
+    # Publicar os artefatos
+    - task: DotNetCoreCLI@2
+      displayName: "Publicar artefatos"
       inputs:
         command: 'publish'
-        projects: '**/*.csproj'  # Publicar todos os projetos .csproj
-        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
+        projects: '$(solution)'
+        arguments: '--configuration $(buildConfiguration) --output $(buildOutput) --no-build'
 
-    # Testes de integração (após publicação, caso necessário)
-    - task: DotNetCoreCLI@2
+    - task: PublishPipelineArtifact@1
+      displayName: "Publicar artefatos no pipeline"
       inputs:
-        command: 'publish'
-        projects: '**/*.csproj'  # Publicar para integração
-        arguments: '--configuration $(buildConfiguration) --output $(buildOutput)'
+        targetPath: '$(buildOutput)'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
 
-    # Etapa de deploy (exemplo de deploy com Docker)
-    #- task: Docker@2
-    #  inputs:
-    #    command: 'buildAndPush'
-    #    repository: 'produto-repo'  # Repositório Docker (ajustar conforme seu repositório)
-    #    dockerfile: '$(Build.SourcesDirectory)/ProdutoGW.API/Dockerfile'  # Caminho para o Dockerfile do projeto API
-    #    tags: '$(Build.BuildId)'  # Tag para a imagem Docker, geralmente o BuildId
-    #    containerRegistry: 'yourRegistryName'  # Nome do seu registry Docker (ajustar conforme necessário)
-    #    buildContext: '$(Build.SourcesDirectory)/ProdutoGW.API'  # Contexto do build Docker
-
-    # Push para o repositório de imagens Docker após o build (caso aplicável)
-    #- task: Docker@2
-    #  inputs:
-    #    command: 'push'
-    #    repository: 'produto-repo'
-    #    tags: '$(Build.BuildId)'
-    #    containerRegistry: 'yourRegistryName'  # Ajustar para o registry Docker
+    # Exemplo de etapas de Docker (opcional)
+    # - task: Docker@2
+    #   displayName: "Build da imagem Docker"
+    #   inputs:
+    #     command: 'buildAndPush'
+    #     repository: 'produto-repo'
+    #     dockerfile: '$(Build.SourcesDirectory)/ProdutoGW.API/Dockerfile'
+    #     tags: '$(Build.BuildId)'
+    #     containerRegistry: 'yourRegistryName'
+    #     buildContext: '$(Build.SourcesDirectory)/ProdutoGW.API'
