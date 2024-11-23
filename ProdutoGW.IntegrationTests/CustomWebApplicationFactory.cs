@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProdutoGW.Domain.Entities;
 using ProdutoGW.Infrastructure.Data;
 
 [CollectionDefinition("Non-Parallel Tests", DisableParallelization = true)]
@@ -25,6 +27,13 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                 options.UseInMemoryDatabase("TestDatabase");
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "FakeScheme";
+                options.DefaultChallengeScheme = "FakeScheme";
+            }).AddScheme<AuthenticationSchemeOptions, FakeAuthenticationHandler>("FakeScheme", _ => { });
+
+
             // Inicializar o banco
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
@@ -33,41 +42,27 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
                 var db = scopedServices.GetRequiredService<ProdutoContext>();
 
                 db.Database.EnsureCreated();
+
+                if (!db.Produtos.Any())
+                {
+                    db.Produtos.Add(new Produto
+                    {
+                        Guid = new Guid("{EA9E2A4A-216D-49BC-B6FD-3527F444AB44}"),
+                        Nome = "Produto Teste",
+                        Descricao = "Descrição Teste",
+                        Categoria = "Categoria 1",
+                        Marca = "Marca 1",
+                        Preco = 100,
+                        QuantidadeEmEstoque = 10
+                    });
+
+                    db.SaveChanges();
+                }
             }
+
+
+
         });
+        builder.UseEnvironment("Development");
     }
-    //protected override void ConfigureWebHost(IWebHostBuilder builder)
-    //{
-    //    builder.UseEnvironment("Development");
-
-    //    builder.ConfigureServices(services =>
-    //    {
-    //        // Remover a configuração do banco de dados em memória
-    //        var serviceDescriptor = services.SingleOrDefault(
-    //            d => d.ServiceType == typeof(DbContextOptions<ProdutoContext>));
-    //        if (serviceDescriptor != null)
-    //        {
-    //            services.Remove(serviceDescriptor);
-    //        }
-
-    //        // Acessar as configurações do appsettings.json
-    //        var configuration = new ConfigurationBuilder()
-    //            .SetBasePath(Directory.GetCurrentDirectory()) // Define o diretório base
-    //            .AddJsonFile("appsettings.json") // Adiciona o arquivo appsettings.json
-    //            .Build();
-
-    //        // Obter a string de conexão diretamente do arquivo de configurações
-    //        var connectionString = configuration.GetConnectionString("DefaultConnection"); // Nome da chave da string de conexão
-
-    //        // Configurar o banco de dados real
-    //        services.AddDbContext<ProdutoContext>(options =>
-    //            options.UseSqlServer(connectionString));
-
-    //        // Criação do banco real ao iniciar (se necessário)
-    //        var sp = services.BuildServiceProvider();
-    //        using var scope = sp.CreateScope();
-    //        var db = scope.ServiceProvider.GetRequiredService<ProdutoContext>();
-    //        db.Database.Migrate(); // Aplica migrações automaticamente
-    //    });
-    //}
 }

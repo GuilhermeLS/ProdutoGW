@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProdutoGW.Domain.Responses.Produtos
+﻿namespace ProdutoGW.Domain.Requests.Produtos
 {
-    public class ProdutoResponse
+    public class ProdutoUpdateRequest
     {
         public Guid Guid { get; set; }
         public string Nome { get; set; }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
@@ -10,8 +11,8 @@ using ProdutoGW.Domain.Responses.Produtos;
 namespace ProdutoGW.API.Controllers
 {
     [Authorize]
-    [Route("api/produto")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ProdutoController : ControllerBase
     {
         private readonly IProdutoService _produtoService;
@@ -24,7 +25,7 @@ namespace ProdutoGW.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProdutoCreateRequest produtoRequest)
+        public async Task<IActionResult> CreateProduto([FromBody] ProdutoCreateRequest produtoRequest)
         {
             try
             {
@@ -34,7 +35,7 @@ namespace ProdutoGW.API.Controllers
 
                 var response = _mapper.Map<ProdutoResponse>(createdProduto);
 
-                return CreatedAtAction(nameof(Created), new { response.ProdutoGuid }, response);
+                return CreatedAtAction(nameof(GetByGuid), new { produtoGuid = createdProduto.Guid }, createdProduto);
             }
             catch (Exception ex)
             {
@@ -47,7 +48,7 @@ namespace ProdutoGW.API.Controllers
         {
             var produtos = await _produtoService.GetAllAsync();
             if (produtos == null || !produtos.Any())
-                return NotFound();
+                return Ok(new List<Produto>());
 
             var response = _mapper.Map<IEnumerable<ProdutoResponse>>(produtos);
 
@@ -67,11 +68,15 @@ namespace ProdutoGW.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] ProdutoCreateRequest produtoRequest)
+        public async Task<IActionResult> Update([FromBody] ProdutoUpdateRequest produtoRequest)
         {
             try
             {
-                var produto = _mapper.Map<Produto>(produtoRequest);
+                var produto = await _produtoService.GetByGuidAsync(produtoRequest.Guid);
+                if (produto == null)
+                    return NotFound();
+
+                produto = _mapper.Map<Produto>(produtoRequest);
 
                 var updatedProduto = await _produtoService.UpdateAsync(produto);
 
@@ -88,6 +93,10 @@ namespace ProdutoGW.API.Controllers
         [HttpDelete("{produtoGuid}")]
         public async Task<IActionResult> Delete(Guid produtoGuid)
         {
+            var produto = await _produtoService.GetByGuidAsync(produtoGuid);
+            if (produto == null)
+                return NotFound(); 
+
             await _produtoService.DeleteAsync(produtoGuid);
             return NoContent();
         }

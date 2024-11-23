@@ -15,6 +15,7 @@ namespace ProdutoGW.API.AutoMappers
             // Produto mappings
             CreateMap<Produto, ProdutoResponse>();
             CreateMap<ProdutoCreateRequest, Produto>();
+            CreateMap<ProdutoUpdateRequest, Produto>();
 
             // Usuário mappings
             CreateMap<Usuario, UsuarioResponse>();
