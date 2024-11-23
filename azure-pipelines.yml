@@ -64,9 +64,9 @@ jobs:
         command: 'test'
         projects: '**/ProdutoGW.IntegrationTests/ProdutoGW.IntegrationTests.csproj'  
         arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(testResultsDirectory)'
-        env:
-          ASPNETCORE_ENVIRONMENT: 'Integration'  
-          ConnectionStrings__DefaultConnection: '$(dbConnectionString)'  
+      env:
+        ASPNETCORE_ENVIRONMENT: 'Integration' 
+        ConnectionStrings__DefaultConnection: '$(dbConnectionString)'  
 
     # Publicar os resultados dos testes de integração
     - task: PublishTestResults@2
