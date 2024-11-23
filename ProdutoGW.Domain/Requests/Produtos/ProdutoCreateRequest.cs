@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProdutoGW.Domain.Requests.Produtos
+﻿namespace ProdutoGW.Domain.Requests.Produtos
 {
     public class ProdutoCreateRequest
     {

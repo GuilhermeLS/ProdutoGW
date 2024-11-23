@@ -44,7 +44,7 @@ namespace ProdutoGW.Application.Services
             var existingProduto = await _produtoRepository.GetByGuidAsync(produto.Guid);
             if (existingProduto == null)
             {
-                return null; 
+                throw new Exception("Produto não existe.");
             }
 
             existingProduto.Nome = produto.Nome;
