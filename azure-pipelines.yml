@@ -23,7 +23,7 @@ jobs:
       displayName: "Instalar SDK do .NET"
       inputs:
         packageType: sdk
-        version: '7'  
+        version: '7.x'  
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
     # Restaurar dependências
