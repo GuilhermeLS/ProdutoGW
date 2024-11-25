@@ -92,25 +92,45 @@ namespace ProdutoGW.Tests
         }
 
         [Fact]
-        public async Task DeleteAsync_ExistingGuid_ShouldReturnTrue()
+        public async Task GetAllAsync_ShouldReturnProdutosList()
         {
             // Arrange
-            var usuario = new Usuario { Guid = Guid.NewGuid() };
+            var usuarios = new List<Usuario>
+            {
+                new Usuario { Guid = Guid.NewGuid(), Nome = "Usuario 1" },
+                new Usuario { Guid = Guid.NewGuid(), Nome = "Usuario 2" }
+            };
 
+            _usuarioRepositoryMock
+                .Setup(r => r.GetAllAsync())
+                .ReturnsAsync(usuarios);
+
+            // Act
+            var result = await _usuarioService.GetAllAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+        }
+
+        [Fact]
+        public async Task GetByGuidAsync_ExistingGuid_ShouldReturnUsuario()
+        {
+            // Arrange
+            var usuario = new Usuario { Guid = Guid.NewGuid(), Nome = "Usuario Teste" };
             _usuarioRepositoryMock
                 .Setup(r => r.GetByGuidAsync(usuario.Guid))
                 .ReturnsAsync(usuario);
 
             // Act
-            var result = await _usuarioService.DeleteAsync(usuario.Guid);
+            var result = await _usuarioService.GetByGuidAsync(usuario.Guid);
 
             // Assert
-            Assert.True(result);
-            _usuarioRepositoryMock.Verify(r => r.DeleteAsync(usuario), Times.Once);
+            Assert.Equal(usuario, result);
         }
 
         [Fact]
-        public async Task DeleteAsync_NonExistingGuid_ShouldReturnFalse()
+        public async Task GetByGuidAsync_NonExistingGuid_ShouldReturnNull()
         {
             // Arrange
             _usuarioRepositoryMock
@@ -118,10 +138,10 @@ namespace ProdutoGW.Tests
                 .ReturnsAsync((Usuario)null);
 
             // Act
-            var result = await _usuarioService.DeleteAsync(Guid.NewGuid());
+            var result = await _usuarioService.GetByGuidAsync(Guid.NewGuid());
 
             // Assert
-            Assert.False(result);
+            Assert.Null(result);
         }
     }
 }

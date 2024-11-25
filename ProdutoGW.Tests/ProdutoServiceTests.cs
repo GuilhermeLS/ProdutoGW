@@ -78,10 +78,10 @@ namespace ProdutoGW.Tests
         {
             // Arrange
             var produtos = new List<Produto>
-    {
-        new Produto { Guid = Guid.NewGuid(), Nome = "Produto 1" },
-        new Produto { Guid = Guid.NewGuid(), Nome = "Produto 2" }
-    };
+            {
+                new Produto { Guid = Guid.NewGuid(), Nome = "Produto 1" },
+                new Produto { Guid = Guid.NewGuid(), Nome = "Produto 2" }
+            };
 
             _produtoRepositoryMock
                 .Setup(r => r.GetAllAsync())
