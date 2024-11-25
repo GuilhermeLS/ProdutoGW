@@ -52,7 +52,7 @@ jobs:
       inputs:
         command: 'test'
         projects: '**/ProdutoGW.Tests/ProdutoGW.Tests.csproj'
-        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(unitTestResultsDirectory) --verbosity detailed'
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --verbosity detailed'
 
     # Publicar os resultados dos testes unitários
     - task: PublishTestResults@2
