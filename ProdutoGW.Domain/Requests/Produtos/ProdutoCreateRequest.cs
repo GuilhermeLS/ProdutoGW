@@ -1,9 +1,7 @@
-﻿namespace ProdutoGW.Domain.Entities
+﻿namespace ProdutoGW.Domain.Requests.Produtos
 {
-    public class Produto
+    public class ProdutoCreateRequest
     {
-        public int Id { get; set; }
-        public Guid Guid { get; set; } = Guid.NewGuid();
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public string Categoria { get; set; }

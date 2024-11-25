@@ -22,9 +22,14 @@ namespace ProdutoGW.Infrastructure.Repositories
                 _context = context;
             }
 
-            public async Task<Usuario?> GetByIdAsync(int id)
+            public async Task<IEnumerable<Usuario>> GetAllAsync()
             {
-                return await _context.Usuarios.FindAsync(id);
+                return await _context.Usuarios.ToListAsync();
+            }
+
+            public async Task<Usuario?> GetByGuidAsync(Guid guid)
+            {
+                return await _context.Usuarios.FirstOrDefaultAsync(u => u.Guid == guid);
             }
 
             public async Task<Usuario> CreateAsync(Usuario usuario)
@@ -35,14 +40,10 @@ namespace ProdutoGW.Infrastructure.Repositories
             }
 
 
-            public async Task DeleteAsync(int id)
+            public async Task DeleteAsync(Usuario usuario)
             {
-                var usuario = await _context.Usuarios.FindAsync(id);
-                if (usuario != null)
-                {
-                    _context.Usuarios.Remove(usuario);
-                    await _context.SaveChangesAsync();
-                }
+                _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
             }
 
             public async Task<Usuario?> GetByEmailAsync(string email)

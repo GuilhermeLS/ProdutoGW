@@ -30,16 +30,15 @@ namespace ProdutoGW.Application.Services
             return await _usuarioRepository.CreateAsync(usuario);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<IEnumerable<Usuario>> GetAllAsync()
         {
-            var usuario = await _usuarioRepository.GetByIdAsync(id);
-            if (usuario == null)
-            {
-                return false;
-            }
+            return await _usuarioRepository.GetAllAsync();
+        }
 
-            await _usuarioRepository.DeleteAsync(id);
-            return true;
+        public async Task<Usuario> GetByGuidAsync(Guid usuarioGuid)
+        {
+            var usuario = await _usuarioRepository.GetByGuidAsync(usuarioGuid);
+            return usuario;
         }
     }
 }

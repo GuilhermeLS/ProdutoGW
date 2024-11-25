@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,17 +13,13 @@ namespace ProdutoGW.Infrastructure.Migrations
         {
             migrationBuilder.InsertData(
                 table: "Usuarios",
-                columns: new[] { "Id", "Email", "Nome", "Role", "SenhaHash" },
-                values: new object[] { 1, "admin@dominio.com", "Administrador", "admin", "$2b$10$MrN.C6KDUmEGxmgaKc7bn.l9yZSUhLlJ2v1IgtTlLcu59XaSTQHi2" });
+                columns: new[] { "Id", "Guid", "Nome", "Email", "SenhaHash", "Role" },
+                values: new object[] {1, new Guid("d893c4bf-2baf-4098-ad88-d3b807385408"), "admin", "admin@dominio.com", "$2b$10$mKvz/rIrH7r9snxB/rsNlupdmWmw1heYWjwVBeyILu8CJHgdgr2AO", "Admin" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Usuarios",
-                keyColumn: "Id",
-                keyValue: 1);
         }
     }
 }

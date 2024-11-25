@@ -6,7 +6,8 @@ namespace ProdutoGW.Application.Interfaces
     {
         Task<Usuario> AutenticarAsync(string email, string senha);
         Task<Usuario> CreateAsync(Usuario usuario);
-        Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<Usuario>> GetAllAsync();
+        Task<Usuario> GetByGuidAsync(Guid produtoGuid);
     }
 }
 

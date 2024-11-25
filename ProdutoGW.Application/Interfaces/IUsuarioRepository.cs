@@ -4,10 +4,11 @@ namespace ProdutoGW.Application.Interfaces
 {
     public interface IUsuarioRepository
     {
-        Task<Usuario> GetByIdAsync(int id);
+        Task<Usuario> GetByGuidAsync(Guid usuarioGuid);
         Task<Usuario> GetByEmailAsync(string email);
+        Task<IEnumerable<Usuario>> GetAllAsync();
         Task<Usuario> CreateAsync(Usuario usuario);
-        Task DeleteAsync(int id);
+        
     }
 }
 

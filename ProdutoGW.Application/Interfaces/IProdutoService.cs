@@ -7,10 +7,10 @@ namespace ProdutoGW.Application.Interfaces
     public interface IProdutoService
     {
         Task<IEnumerable<Produto>> GetAllAsync();
-        Task<Produto> GetByIdAsync(int id);
+        Task<Produto> GetByGuidAsync(Guid produtoGuid);
         Task<Produto> CreateAsync(Produto produto);
         Task<Produto> UpdateAsync(Produto produto);
-        Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteAsync(Guid produtoGuid);
     }
 }
 

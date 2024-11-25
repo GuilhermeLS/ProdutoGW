@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
-using ProdutoGW.Domain.Requests;
+using ProdutoGW.Domain.Requests.Login;
 
 namespace ProdutoGW.API.Controllers
 {
@@ -27,5 +27,6 @@ namespace ProdutoGW.API.Controllers
             var token = _tokenService.GerarToken(usuario);
             return Ok(new { token });
         }
+
     }
 }

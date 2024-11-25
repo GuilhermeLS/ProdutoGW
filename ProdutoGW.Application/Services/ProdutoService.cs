@@ -21,7 +21,7 @@ namespace ProdutoGW.Application.Services
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var existingProduct = await _produtoRepository.GetByIdAsync(produto.Id);
+            var existingProduct = await _produtoRepository.GetByGuidAsync(produto.Guid);
             if (existingProduct != null)
                 throw new Exception("Produto já existe.");
 
@@ -33,39 +33,40 @@ namespace ProdutoGW.Application.Services
             return await _produtoRepository.GetAllAsync();
         }
 
-        public async Task<Produto> GetByIdAsync(int id)
+        public async Task<Produto> GetByGuidAsync(Guid produtoGuid)
         {
-            var produto = await _produtoRepository.GetByIdAsync(id);
+            var produto = await _produtoRepository.GetByGuidAsync(produtoGuid);
             return produto;
         }
 
         public async Task<Produto> UpdateAsync(Produto produto)
         {
-            var existingProduto = await _produtoRepository.GetByIdAsync(produto.Id);
+            var existingProduto = await _produtoRepository.GetByGuidAsync(produto.Guid);
             if (existingProduto == null)
             {
-                return null; 
+                throw new Exception("Produto não existe.");
             }
 
-            // Atualiza os dados do produto
             existingProduto.Nome = produto.Nome;
             existingProduto.Preco = produto.Preco;
             existingProduto.Descricao = produto.Descricao;
+            existingProduto.Categoria = produto.Categoria;
+            existingProduto.Marca = produto.Marca;
+            existingProduto.QuantidadeEmEstoque = produto.QuantidadeEmEstoque;
 
-            // Chama o repositório para salvar a atualização
             var updatedProduto = await _produtoRepository.UpdateAsync(existingProduto);
             return updatedProduto;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid produtoGuid)
         {
-            var produto = await _produtoRepository.GetByIdAsync(id);
+            var produto = await _produtoRepository.GetByGuidAsync(produtoGuid);
             if (produto == null)
             {
                 return false;
             }
 
-            await _produtoRepository.DeleteAsync(id);
+            await _produtoRepository.DeleteAsync(produto);
             return true;
         }
     }

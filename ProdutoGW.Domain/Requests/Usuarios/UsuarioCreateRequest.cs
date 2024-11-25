@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProdutoGW.Domain.Requests
+namespace ProdutoGW.Domain.Requests.Usuarios
 {
-    public class RegisterRequest
+    public class UsuarioCreateRequest
     {
         public string Nome { get; set; }
         public string Email { get; set; }
         public string Senha { get; set; }
     }
-
 }
