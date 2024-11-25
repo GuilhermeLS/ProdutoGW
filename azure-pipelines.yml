@@ -10,7 +10,8 @@ variables:
   buildPlatform: 'Any CPU'  
   buildOutput: '$(Build.ArtifactStagingDirectory)'  
   dbConnectionString: 'Server=localhost\\SQLEXPRESS;Database=ProdutoDB;User Id=sa;Password=xpto@123;TrustServerCertificate=True'  
-  testResultsDirectory: '$(Build.SourcesDirectory)/TestResults'  # Diretório para os resultados dos testes
+  unitTestResultsDirectory: '$(Agent.TempDirectory)/UnitTestResults'
+  integrationTestResultsDirectory: '$(Agent.TempDirectory)/IntegrationTestResults'
 
 jobs:
 - job: BuildTestPublish
@@ -46,16 +47,16 @@ jobs:
       displayName: "Executar testes unitários"
       inputs:
         command: 'test'
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(testResultsDirectory)'
+        projects: '**/ProdutoGW.Tests/ProdutoGW.Tests.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(unitTestResultsDirectory) --verbosity detailed'
 
     # Publicar os resultados dos testes unitários
     - task: PublishTestResults@2
       displayName: "Publicar resultados dos testes unitários"
       inputs:
         testResultsFormat: 'VSTest'
-        testResultsFiles: '**/*.trx'
-        searchFolder: '$(testResultsDirectory)'
+        testResultsFiles: '$(unitTestResultsDirectory)/**/*.trx'
+        searchFolder: '$(unitTestResultsDirectory)'
 
     # Executar testes de integração
     - task: DotNetCoreCLI@2
@@ -63,7 +64,7 @@ jobs:
       inputs:
         command: 'test'
         projects: '**/ProdutoGW.IntegrationTests/ProdutoGW.IntegrationTests.csproj'  
-        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(testResultsDirectory)'
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(integrationTestResultsDirectory) --verbosity detailed'
       env:
         ASPNETCORE_ENVIRONMENT: 'Integration' 
         ConnectionStrings__DefaultConnection: '$(dbConnectionString)'  
@@ -73,8 +74,8 @@ jobs:
       displayName: "Publicar resultados dos testes de integração"
       inputs:
         testResultsFormat: 'VSTest'
-        testResultsFiles: '**/*.trx'
-        searchFolder: '$(testResultsDirectory)'
+        testResultsFiles: '$(integrationTestResultsDirectory)/**/*.trx'
+        searchFolder: '$(integrationTestResultsDirectory)'
 
     # Publicar os artefatos
     - task: DotNetCoreCLI@2
