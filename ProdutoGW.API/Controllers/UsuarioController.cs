@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Domain.Requests;
 using ProdutoGW.Domain.Requests.Usuarios;
+using ProdutoGW.Domain.Responses.Produtos;
 using ProdutoGW.Domain.Responses.Usuarios;
 
 namespace ProdutoGW.API.Controllers
 {
+    [Authorize]
     [Route("api/usuario")]
     [ApiController]
     public class UsuarioController : ControllerBase
@@ -25,23 +28,38 @@ namespace ProdutoGW.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UsuarioCreateRequest request)
         {
-            // Usa o AutoMapper para mapear o request para a entidade de domínio
             var usuario = _mapper.Map<Usuario>(request);
-            usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha); // Gera o hash da senha
-            usuario.Role = "User"; // Define a role padrão para novos usuários
+            usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Senha);
+            usuario.Role = "User"; 
 
             var createdUsuario = await _usuarioService.CreateAsync(usuario);
 
-            // Mapeia a entidade criada para a response
             var response = _mapper.Map<UsuarioResponse>(createdUsuario);
-            return CreatedAtAction(nameof(Create), new { response.UsuarioGuid }, response);
+            return CreatedAtAction(nameof(Create), new { response.Guid }, response);
         }
 
-        [HttpDelete("{guid}")]
-        public async Task<IActionResult> Delete(Guid usuarioGuid)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            await _usuarioService.DeleteAsync(usuarioGuid);
-            return NoContent();
+            var usuarios = await _usuarioService.GetAllAsync();
+            if (usuarios == null || !usuarios.Any())
+                return Ok(new List<Usuario>());
+
+            var response = _mapper.Map<IEnumerable<UsuarioResponse>>(usuarios);
+
+            return Ok(response);
+        }
+
+        [HttpGet("{usuarioGuid}")]
+        public async Task<IActionResult> GetByGuid(Guid usuarioGuid)
+        {
+            var usuario = await _usuarioService.GetByGuidAsync(usuarioGuid);
+            if (usuario == null)
+                return NotFound();
+
+            var response = _mapper.Map<UsuarioResponse>(usuario);
+
+            return Ok(response);
         }
     }
 }

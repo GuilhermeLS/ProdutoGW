@@ -34,7 +34,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
             }).AddScheme<AuthenticationSchemeOptions, FakeAuthenticationHandler>("FakeScheme", _ => { });
 
 
-            // Inicializar o banco
+            // Inicializar o banco em memória para os testes
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
             {
@@ -58,10 +58,18 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
 
                     db.SaveChanges();
                 }
+
+                db.Usuarios.Add(new Usuario
+                {
+                    Guid = new Guid("{8F8F2756-3C1D-4D87-BCC2-782CE38EEFC1}"),
+                    Nome = "Usuario Teste",
+                    Email = "usuarioteste@dominio.com",
+                    Role = "Teste",
+                    SenhaHash = BCrypt.Net.BCrypt.HashPassword("senhateste")
+                });
+
+                db.SaveChanges();
             }
-
-
-
         });
         builder.UseEnvironment("Development");
     }
