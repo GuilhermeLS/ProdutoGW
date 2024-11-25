@@ -68,7 +68,7 @@ jobs:
       inputs:
         command: 'test'
         projects: '**/ProdutoGW.IntegrationTests/ProdutoGW.IntegrationTests.csproj'  
-        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory $(integrationTestResultsDirectory) --verbosity detailed'
+        arguments: '--configuration $(buildConfiguration) --no-build --logger trx --verbosity detailed'
       env:
         ASPNETCORE_ENVIRONMENT: 'Integration' 
         ConnectionStrings__DefaultConnection: '$(dbConnectionString)'  
