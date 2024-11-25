@@ -34,6 +34,10 @@ jobs:
         command: 'restore'
         projects: '$(solution)'
 
+    - script: |
+        dotnet --info
+      displayName: "Verificar versão do .NET SDK"
+
     # Compilar o projeto
     - task: DotNetCoreCLI@2
       displayName: "Compilar solução"
@@ -91,14 +95,3 @@ jobs:
         targetPath: '$(buildOutput)'
         artifact: 'drop'
         publishLocation: 'pipeline'
-
-    # Exemplo de etapas de Docker (opcional)
-    # - task: Docker@2
-    #   displayName: "Build da imagem Docker"
-    #   inputs:
-    #     command: 'buildAndPush'
-    #     repository: 'produto-repo'
-    #     dockerfile: '$(Build.SourcesDirectory)/ProdutoGW.API/Dockerfile'
-    #     tags: '$(Build.BuildId)'
-    #     containerRegistry: 'yourRegistryName'
-    #     buildContext: '$(Build.SourcesDirectory)/ProdutoGW.API'

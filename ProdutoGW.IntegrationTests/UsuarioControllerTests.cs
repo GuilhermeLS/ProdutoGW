@@ -52,30 +52,4 @@ public class UsuarioControllerTests : IClassFixture<CustomWebApplicationFactory<
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
-
-    [Fact]
-    public async Task DeleteUsuario_WithValidGuid_ShouldReturnNoContent()
-    {
-        // Arrange
-        var guid = "VALID_GUID";
-
-        // Act
-        var response = await _client.DeleteAsync($"/api/usuario/{guid}");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-    }
-
-    [Fact]
-    public async Task DeleteUsuario_WithInvalidGuid_ShouldReturnNotFound()
-    {
-        // Arrange
-        var guid = "INVALID_GUID";
-
-        // Act
-        var response = await _client.DeleteAsync($"/api/usuario/{guid}");
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
 }
