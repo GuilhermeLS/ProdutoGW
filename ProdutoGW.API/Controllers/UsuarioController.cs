@@ -2,11 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
-using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
-using ProdutoGW.Domain.Requests;
 using ProdutoGW.Domain.Requests.Usuarios;
-using ProdutoGW.Domain.Responses.Produtos;
 using ProdutoGW.Domain.Responses.Usuarios;
 
 namespace ProdutoGW.API.Controllers

@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using ProdutoGW.API.AutoMappers;
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Domain.Validation;
 using ProdutoGW.Infrastructure.Data;
 using ProdutoGW.Infrastructure.Repositories;
-using System.Text;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.OpenApi.Models;
 using ProdutoGW.Infrastructure.Repositories.ProdutoGW.Infrastructure.Repositories;
-using ProdutoGW.API.AutoMappers;
+using System.Text;
 
 public class Startup
 {
