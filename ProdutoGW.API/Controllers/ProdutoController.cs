@@ -24,6 +24,10 @@ namespace ProdutoGW.API.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Inclusão de um novo produto.
+        /// </summary>
+        /// <returns>O produto criado.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateProduto([FromBody] ProdutoCreateRequest produtoRequest)
         {
@@ -43,6 +47,10 @@ namespace ProdutoGW.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Consulta todos os produtos.
+        /// </summary>
+        /// <returns>Uma lista com os produtos existentes.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -55,6 +63,10 @@ namespace ProdutoGW.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Consulta um produto específico.
+        /// </summary>
+        /// <returns>Um produtos existente que corresponda ao GUID.</returns>
         [HttpGet("{produtoGuid}")]
         public async Task<IActionResult> GetByGuid(Guid produtoGuid)
         {
@@ -67,6 +79,10 @@ namespace ProdutoGW.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Atualiza um produto específico.
+        /// </summary>
+        /// <returns>O produto atualizado.</returns>
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] ProdutoUpdateRequest produtoRequest)
         {
@@ -90,6 +106,9 @@ namespace ProdutoGW.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Exclusão de um produto específico.
+        /// </summary>
         [HttpDelete("{produtoGuid}")]
         public async Task<IActionResult> Delete(Guid produtoGuid)
         {
