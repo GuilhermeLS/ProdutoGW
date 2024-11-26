@@ -8,6 +8,7 @@
 
 <PropertyGroup>
   <PreserveCompilationContext>true</PreserveCompilationContext>
+  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 </PropertyGroup>
 
   <ItemGroup>
