@@ -1,10 +1,9 @@
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
+using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
-using ProdutoGW.Application.Interfaces;
-using FluentValidation;
-using ProdutoGW.Domain.Validation;
-using FluentValidation.Results;
 
 namespace ProdutoGW.Tests
 {
@@ -25,7 +24,7 @@ namespace ProdutoGW.Tests
         public async Task CreateAsync_InvalidProduto_ShouldThrowValidationException()
         {
             // Arrange
-            var produto = new Produto(); // Produto inválido
+            var produto = new Produto(); 
             _validatorMock
                 .Setup(v => v.ValidateAsync(produto, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult(new List<ValidationFailure> { new ValidationFailure("Nome", "Nome é obrigatório.") }));

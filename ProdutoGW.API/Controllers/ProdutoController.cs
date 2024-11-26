@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ProdutoGW.Application.Interfaces;
-using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Domain.Requests.Produtos;
 using ProdutoGW.Domain.Responses.Produtos;

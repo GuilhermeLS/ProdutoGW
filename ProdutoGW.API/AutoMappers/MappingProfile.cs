@@ -4,7 +4,6 @@ using ProdutoGW.Domain.Requests.Produtos;
 using ProdutoGW.Domain.Requests.Usuarios;
 using ProdutoGW.Domain.Responses.Produtos;
 using ProdutoGW.Domain.Responses.Usuarios;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProdutoGW.API.AutoMappers
 {
