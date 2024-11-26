@@ -2,11 +2,6 @@
 using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProdutoGW.Infrastructure.Repositories
 {

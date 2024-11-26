@@ -2,11 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProdutoGW.Application.Interfaces;
-using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
-using ProdutoGW.Domain.Requests;
 using ProdutoGW.Domain.Requests.Usuarios;
-using ProdutoGW.Domain.Responses.Produtos;
 using ProdutoGW.Domain.Responses.Usuarios;
 
 namespace ProdutoGW.API.Controllers
@@ -25,6 +22,10 @@ namespace ProdutoGW.API.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Inclusão de um novo usuário.
+        /// </summary>
+        /// <returns>O usuário criado.</returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UsuarioCreateRequest request)
         {
@@ -38,6 +39,10 @@ namespace ProdutoGW.API.Controllers
             return CreatedAtAction(nameof(Create), new { response.Guid }, response);
         }
 
+        /// <summary>
+        /// Consulta todos os usuários.
+        /// </summary>
+        /// <returns>Uma lista com os usuários existentes.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -50,6 +55,10 @@ namespace ProdutoGW.API.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Consulta um usuário específico.
+        /// </summary>
+        /// <returns>Um usuário existente que corresponda ao GUID.</returns>
         [HttpGet("{usuarioGuid}")]
         public async Task<IActionResult> GetByGuid(Guid usuarioGuid)
         {

@@ -17,6 +17,10 @@ namespace ProdutoGW.API.Controllers
             _tokenService = tokenService;
         }
 
+        /// <summary>
+        /// Realiza a autenticação de um usuário.
+        /// </summary>
+        /// <returns>O Token de autorização.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {

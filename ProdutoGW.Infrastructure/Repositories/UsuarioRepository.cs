@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProdutoGW.Infrastructure.Repositories
+﻿namespace ProdutoGW.Infrastructure.Repositories
 {
-    using Microsoft.EntityFrameworkCore;
+    using global::ProdutoGW.Application.Interfaces;
     using global::ProdutoGW.Domain.Entities;
     using global::ProdutoGW.Infrastructure.Data;
-    using global::ProdutoGW.Application.Interfaces;
+    using Microsoft.EntityFrameworkCore;
 
     namespace ProdutoGW.Infrastructure.Repositories
     {
