@@ -9,8 +9,8 @@ using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Domain.Validation;
 using ProdutoGW.Infrastructure.Data;
+using ProdutoGW.Infrastructure.Interfaces;
 using ProdutoGW.Infrastructure.Repositories;
-using ProdutoGW.Infrastructure.Repositories.ProdutoGW.Infrastructure.Repositories;
 using System.Text;
 
 public class Startup

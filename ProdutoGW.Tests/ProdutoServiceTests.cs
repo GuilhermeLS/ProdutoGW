@@ -1,9 +1,10 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
-using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
+using ProdutoGW.Infrastructure.Interfaces;
+using ProdutoGW.Infrastructure.Repositories;
 
 namespace ProdutoGW.Tests
 {

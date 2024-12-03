@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Domain.Entities;
 using ProdutoGW.Infrastructure.Data;
+using ProdutoGW.Infrastructure.Interfaces;
 
 namespace ProdutoGW.Infrastructure.Repositories
 {

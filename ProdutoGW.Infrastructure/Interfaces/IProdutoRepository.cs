@@ -1,6 +1,6 @@
 ﻿using ProdutoGW.Domain.Entities;
 
-namespace ProdutoGW.Application.Interfaces
+namespace ProdutoGW.Infrastructure.Interfaces
 {
     public interface IProdutoRepository
     {
