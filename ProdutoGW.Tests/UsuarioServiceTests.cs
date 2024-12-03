@@ -1,7 +1,7 @@
 ﻿using Moq;
-using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Application.Services;
 using ProdutoGW.Domain.Entities;
+using ProdutoGW.Infrastructure.Interfaces;
 
 namespace ProdutoGW.Tests
 {

@@ -1,6 +1,7 @@
 ﻿using ProdutoGW.Application.Interfaces;
 using ProdutoGW.Domain.Entities;
 using FluentValidation;
+using ProdutoGW.Infrastructure.Interfaces;
 
 namespace ProdutoGW.Application.Services
 {
